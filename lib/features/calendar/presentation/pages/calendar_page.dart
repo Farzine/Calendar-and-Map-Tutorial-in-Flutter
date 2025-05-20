@@ -1,205 +1,143 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:infinite_calendar_view/infinite_calendar_view.dart';
-import 'package:calendar_view/calendar_view.dart';
-import 'package:easy_date_timeline/easy_date_timeline.dart';
-import '../providers/calendar_provider.dart';
-import '../widgets/calendar_view_selector.dart';
-import '../widgets/event_list.dart';
-import '../../../map/presentation/pages/map_page.dart';
+import '../widgets/Button.dart'; // Import our Button widget
 
-class CalendarPage extends ConsumerStatefulWidget {
-  const CalendarPage({super.key});
+class ButtonExampleScreen extends StatefulWidget {
+  const ButtonExampleScreen({super.key});
 
   @override
-  ConsumerState<CalendarPage> createState() => _CalendarPageState();
+  State<ButtonExampleScreen> createState() => _ButtonExampleScreenState();
 }
 
-class _CalendarPageState extends ConsumerState<CalendarPage> {
-  final EventController _eventController = EventController();
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(calendarNotifierProvider.notifier).fetchEvents(DateTime.now());
+class _ButtonExampleScreenState extends State<ButtonExampleScreen> {
+  bool _isLoading = false;
+  
+  // Simulate loading state
+  void _simulateLoading() {
+    setState(() {
+      _isLoading = true;
+    });
+    
+    // Reset after 2 seconds
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final calendarState = ref.watch(calendarNotifierProvider);
-    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Calendar'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.map),
-            onPressed: () => context.go('/map'),
-          ),
-        ],
+        title: const Text('Button Examples'),
+        backgroundColor: Colors.grey[200],
       ),
-      body: Column(
-        children: [
-          CalendarViewSelector(
-            currentView: calendarState.currentView,
-            onViewChanged: (viewType) {
-              ref.read(calendarNotifierProvider.notifier).changeView(viewType);
-            },
-          ),
-          Expanded(
-            child: _buildCalendarView(calendarState),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Add new event
-        },
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
-
-  Widget _buildCalendarView(CalendarState state) {
-    switch (state.currentView) {
-      case CalendarViewType.day:
-        return _buildDayView(state);
-      case CalendarViewType.week:
-        return _buildWeekView(state);
-      case CalendarViewType.month:
-        return _buildMonthView(state);
-      case CalendarViewType.timeline:
-        return _buildTimelineView(state);
-      case CalendarViewType.agenda:
-        return _buildAgendaView(state);
-      default:
-        return _buildMonthView(state);
-    }
-  }
-
-  Widget _buildDayView(CalendarState state) {
-    return DayView(
-      controller: _eventController,
-      eventTileBuilder: (date, events, boundary, startDuration, endDuration) {
-        return Container(
-          decoration: BoxDecoration(
-            color: events.first.color,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Center(
-            child: Text(
-              events.first.title ?? '',
-              style: const TextStyle(color: Colors.white),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Example 1: Default Button
+                const Text(
+                  'Default Button',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(height: 10),
+                const Button(
+                  text: 'Sign In',
+                  routeName: '/home',
+                ),
+                
+                const SizedBox(height: 40),
+                
+                // Example 2: Button with Custom Colors
+                const Text(
+                  'Custom Colors',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(height: 10),
+                const Button(
+                  text: 'Continue',
+                  routeName: '/next',
+                  backgroundColor: Color(0xFF2196F3), // Blue
+                  textColor: Color(0xFFFFFFFF), // White
+                ),
+                
+                const SizedBox(height: 40),
+                
+                // Example 3: Button with Icon
+                const Text(
+                  'Button with Icon',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(height: 10),
+                const Button(
+                  text: 'Share',
+                  routeName: '/share',
+                  icon: Icons.share,
+                ),
+                
+                const SizedBox(height: 40),
+                
+                // Example 4: Loading Button
+                Text(
+                  'Loading Button (Press to see loading state)',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                Button(
+                  text: 'Get Started one two',
+                  routeName: '/submit',
+                  isLoading: _isLoading,
+                  onPressed: _simulateLoading,
+                ),
+                
+                const SizedBox(height: 40),
+                
+                // Example 5: Combination of Features
+                const Text(
+                  'Combining Multiple Features',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(height: 10),
+                Button(
+                  text: 'Save',
+                  routeName: '/save',
+                  icon: Icons.save,
+                  backgroundColor: const Color(0xFF4CAF50), // Green
+                  textColor: Colors.white,
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Changes saved successfully!')),
+                    );
+                  },
+                ),
+                
+                const SizedBox(height: 40),
+                
+                // Example 6: Different Use Case - Destructive Action
+                const Text(
+                  'Destructive Action',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(height: 10),
+                const Button(
+                  text: 'Delete',
+                  routeName: '/delete',
+                  icon: Icons.delete_outline,
+                    backgroundColor: Color.fromRGBO(255, 68, 5, 1), 
+                  textColor: Colors.white,
+                ),
+              ],
             ),
           ),
-        );
-      },
-    );
-  }
-
-  Widget _buildWeekView(CalendarState state) {
-    return WeekView(
-      controller: _eventController,
-      eventTileBuilder: (date, events, boundary, startDuration, endDuration) {
-        return Container(
-          decoration: BoxDecoration(
-            color: events.first.color,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Center(
-            child: Text(
-              events.first.title ?? '',
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildMonthView(CalendarState state) {
-    return MonthView(
-      controller: _eventController,
-      onCellTap: (events, date) {
-        ref.read(calendarNotifierProvider.notifier).selectDay(date, date);
-      },
-      // dayBuilder: (context, date, isSelected) {
-      //   final events = ref.read(calendarNotifierProvider.notifier).getEventsForDay(date);
-      //   return GestureDetector(
-      //     onTap: () {
-      //       ref.read(calendarNotifierProvider.notifier).selectDay(date, date);
-      //     },
-      //     child: Container(
-      //       decoration: BoxDecoration(
-      //         color: isSelected ? Theme.of(context).colorScheme.primaryContainer : null,
-      //         borderRadius: BorderRadius.circular(8),
-      //         border: isSelected 
-      //           ? Border.all(color: Theme.of(context).colorScheme.primary, width: 2)
-      //           : null,
-      //       ),
-      //       child: Column(
-      //         mainAxisAlignment: MainAxisAlignment.center,
-      //         children: [
-      //           Text(
-      //             date.day.toString(),
-      //             style: TextStyle(
-      //               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-      //             ),
-      //           ),
-      //           if (events.isNotEmpty)
-      //             Container(
-      //               margin: const EdgeInsets.only(top: 4),
-      //               width: 6,
-      //               height: 6,
-      //               decoration: BoxDecoration(
-      //                 color: events.first.color,
-      //                 shape: BoxShape.circle,
-      //               ),
-      //             ),
-      //         ],
-      //       ),
-      //     ),
-      //   );
-      // },
-    );
-  }
-
-  Widget _buildTimelineView(CalendarState state) {
-    return EasyDateTimeLine(
-      initialDate: state.selectedDay,
-      onDateChange: (selectedDate) {
-        ref.read(calendarNotifierProvider.notifier).selectDay(selectedDate, selectedDate);
-      },
-      headerProps: const EasyHeaderProps(
-        showHeader: true,
-        showMonthPicker: true,
-        monthPickerType: MonthPickerType.dropDown,
-      ),
-      dayProps: const EasyDayProps(
-        height: 80,
-        width: 60,
-        dayStructure: DayStructure.dayNumDayStr,
-      ),
-      activeColor: Theme.of(context).colorScheme.primary,
-      timeLineProps: const EasyTimeLineProps(
-        hPadding: 16,
-        separatorPadding: 16,
+        ),
       ),
     );
-  }
-
-  Widget _buildAgendaView(CalendarState state) {
-    if (state.isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    } else if (state.errorMessage != null) {
-      return Center(child: Text('Error: ${state.errorMessage}'));
-    } else if (state.events.isEmpty) {
-      return const Center(child: Text('No events scheduled for this day'));
-    }
-    
-    return EventList(events: state.events);
   }
 }

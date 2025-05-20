@@ -15,7 +15,9 @@ final _router = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => const CalendarPage(),
+      builder: (context, state) {
+        return const ButtonExampleScreen();
+      },
     ),
     GoRoute(
       path: '/map',
